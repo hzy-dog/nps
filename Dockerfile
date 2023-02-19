@@ -13,7 +13,7 @@ RUN wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_amd64_
     rm -f linux_amd64_server.tar.gz
 
 # 暴露 nps 服务端口
-EXPOSE 8024
+EXPOSE 80
 
 # 运行 nps 服务
 CMD ["./nps", "server"]
