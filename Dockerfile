@@ -1,12 +1,19 @@
-FROM golang:1.15 as builder
-ARG GOPROXY=direct
-WORKDIR /go/src/ehang.io/nps
-COPY . .
-RUN go get -d -v ./... 
-RUN CGO_ENABLED=0 go build -ldflags="-w -s -extldflags -static" ./cmd/nps/nps.go
+# 使用官方提供的 alpine 镜像作为基础镜像
+FROM alpine:3.14
 
-FROM scratch
-COPY --from=builder /go/src/ehang.io/nps/nps /
-COPY --from=builder /go/src/ehang.io/nps/web /web
-VOLUME /conf
-CMD ["/nps"]
+# 设置工作目录
+WORKDIR /app
+
+# 安装必要的依赖
+RUN apk add --no-cache wget
+
+# 下载 nps 并解压
+RUN wget https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_amd64_server.tar.gz && \
+    tar -xzf linux_amd64_server.tar.gz && \
+    rm -f linux_amd64_server.tar.gz
+
+# 暴露 nps 服务端口
+EXPOSE 8024
+
+# 运行 nps 服务
+CMD ["./nps", "server"]
